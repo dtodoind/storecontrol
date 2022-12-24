@@ -14,6 +14,7 @@ function Dropdown({ name, dropvalues, onChange, touched, errors, value_select, i
     const [filter_val, setFilterVal] = useState()
     const [inputText, setInputText] = useState('')
     const [open, setOpen] = useState(false)
+    const [caterror, setCatError] = useState('')
 
     useEffect(() => {
         function selecting() {
@@ -34,16 +35,20 @@ function Dropdown({ name, dropvalues, onChange, touched, errors, value_select, i
         e.preventDefault()
         if(name === 'Category_id') {
             if(Status) {
-                await axios.post('https://storecontrolserver-production.up.railway.app/category/new', { Category_id: uuidv4(), nombre: inputText})
-                    .then(async (item) => {
-                        category(item.data)
-                        var cate = CategoryAdd
-                        cate.push(item.data)
-                        if(window.desktop) {
-                            await window.api.addData(cate, "CategoryAdd")
-                        }
-                        setInputText('')
-                    })
+                if(!CategoryAdd.map(cat => cat.nombre).includes(inputText)) {
+                    await axios.post('https://storecontrolserver-production.up.railway.app/category/new', { Category_id: uuidv4(), nombre: inputText})
+                        .then(async (item) => {
+                            category(item.data)
+                            var cate = CategoryAdd
+                            cate.push(item.data)
+                            if(window.desktop) {
+                                await window.api.addData(cate, "CategoryAdd")
+                            }
+                            setInputText('')
+                        })
+                } else {
+                    setCatError(`${inputText} is already present`)
+                }
             } else {
                 var input_name = {
                     Category_id: uuidv4(),
@@ -169,7 +174,15 @@ function Dropdown({ name, dropvalues, onChange, touched, errors, value_select, i
                                     inputbox
                                     ? <div className='input_main_box d-flex align-items-center w-100'>
                                         <div className='w-100 flex-1'>
-                                            <input type='text' className='w-100 p-1 input_cat' value={inputText} onChange={(e) => setInputText(e.target.value)} />
+                                            <input 
+                                                type='text' 
+                                                className='w-100 p-1 input_cat' 
+                                                value={inputText} 
+                                                onChange={(e) => {
+                                                    setInputText(e.target.value)
+                                                    setCatError('')
+                                                }} 
+                                            />
                                         </div>
                                         <div>
                                             <button type="button" className='btn' onClick={(e) => input_submit(e, name)}><FontAwesomeIcon icon="plus" /></button>
@@ -188,6 +201,11 @@ function Dropdown({ name, dropvalues, onChange, touched, errors, value_select, i
                                     : null
                                 }
                                 {
+                                    name === "Category_id" && caterror !== ''
+                                    ? <span style={{color: 'red'}}>{caterror}</span>
+                                    : null
+                                }
+                                {
                                     name === "Category_id"
                                     ? dropvalues?.map((item, index) => 
                                         <div key={index} className="cate_option">
@@ -196,6 +214,7 @@ function Dropdown({ name, dropvalues, onChange, touched, errors, value_select, i
                                                 onClick={() => {
                                                     setSelected(item)
                                                     onChange(name, item)
+                                                    setCatError('')
                                                     dropingdown()
                                                 }}
                                             >
