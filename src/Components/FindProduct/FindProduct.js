@@ -519,6 +519,18 @@ function FindProduct({ addorder, allpro, setAllPro, ...props }) {
 												: JSON.parse(localStorage.getItem('DepositoLogin')).nombre === pro.deposito.nombre
 													? <tr key={index} style={{cursor: 'pointer'}}>
 														<th onClick={() => details(pro)} scope="row" className='text-center align-middle' data-toggle="modal" data-target="#detailsproduct">{index+1}</th>
+														<th onClick={() => details(pro)} scope="row" className='text-center align-middle' data-toggle="modal" data-target="#detailsproduct">
+															<img
+																// src={
+																//     JSON.parse(p.Image)[0] !== undefined
+																//         ? `${JSON.parse(p.Image)[0][0]}`
+																//         : null
+																// }
+																src={pro.Image.length === 0 || pro.Image[0].length === 0 ? require("../../assets/product-default-image.png") : pro.Image[0][0].url}
+																alt=""
+																style={{ width: "50px" }}
+															/>
+														</th>
 														<td onClick={() => details(pro)} className='align-middle' data-toggle="modal" data-target="#detailsproduct">{pro.nombre}</td>
 														<td onClick={() => details(pro)} className='align-middle' data-toggle="modal" data-target="#detailsproduct">{pro.description}</td>
 														<td onClick={() => details(pro)} className='text-center align-middle' data-toggle="modal" data-target="#detailsproduct">{pro.deposito.nombre}</td>
